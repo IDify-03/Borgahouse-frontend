@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaSearch, FaLock, FaUnlock } from 'react-icons/fa';
+import { getAllLockData } from './LandingPage';
 
-const transactionsData = [
-  {
-    id: 1,
-    description: 'Transaction 1',
-    amount: 100.0,
-    locked: true,
-  },
-  {
-    id: 2,
-    description: 'Transaction 2',
-    amount: 50.0,
-    locked: false,
-  },
-  {
-    id: 3,
-    description: 'Transaction 3',
-    amount: 75.0,
-    locked: true,
-  },
-  // Add more transaction data
-];
+const truncateAddress = (address) => {
+    if (!address) return "No Account";
+    const match = address.match(
+    /^(0x[a-zA-Z0-9]{2})[a-zA-Z0-9]+([a-zA-Z0-9]{3})$/
+    );
+    if (!match) return address;
+    return `${match[1]}…${match[2]}`;
+};
+    
+const toHex = (num) => {
+    const val = Number(num);
+    return "0x" + val.toString(16);
+};
 
 const Transactions = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    getAllLockData((data) => {
+        setData(data);
+    });
+  })
   
   return (
     <div className="container mx-auto p-4 pt-24">
@@ -45,21 +45,21 @@ const Transactions = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {transactionsData
-          .filter((transaction) => transaction.description.toLowerCase().includes(searchTerm.toLowerCase()))
-          .map((transaction) => (
-            <div key={transaction.id} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-              <h2 className="text-xl font-semibold mb-2">{transaction.description}</h2>
-              <p className="text-gray-600">Amount: ${transaction.amount}</p>
-              <button
-                className={`mt-4 w-full bg-${transaction.locked ? 'blue' : 'blue'}-500 hover:bg-${transaction.locked ? 'blue' : ''}-700 text-white py-2 rounded-full transition duration-300 flex justify-center items-center`}
-                disabled={!transaction.locked}
-              >
-                {transaction.locked ? <FaLock className="mr-2" /> : <FaUnlock className="mr-2" /> }
-                {transaction.locked ? 'Unlock' : 'Completed'}
-              </button>
+      {data.map((d, index) => {
+        return (
+            <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <h2 className="text-xl font-semibold mb-2">Address {truncateAddress(d.seller)}</h2>
+                <p className="text-gray-600">Amount: ${d.amount}</p>
+                <button
+                    className={`mt-4 w-full bg-${d.locked ? 'blue' : 'blue'}-500 hover:bg-${d.locked ? 'blue' : ''}-700 text-white py-2 rounded-full transition duration-300 flex justify-center items-center`}
+                    disabled={!d.locked}
+                >
+                    {d.locked ? <FaLock className="mr-2" /> : <FaUnlock className="mr-2" /> }
+                    {d.locked ? 'Unlock' : 'Completed'}
+                </button>
             </div>
-          ))}
+        )
+    })}
       </div>
     </div>
   );
