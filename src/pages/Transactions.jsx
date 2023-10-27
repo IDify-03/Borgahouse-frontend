@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaSearch, FaLock, FaUnlock } from 'react-icons/fa';
-import { getAllLockData } from './LandingPage';
+import { getAllLockData, unlockMoney } from './LandingPage';
+import {toast} from "react-hot-toast";
 
 const truncateAddress = (address) => {
     if (!address) return "No Account";
@@ -45,12 +46,23 @@ const Transactions = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {data.map((d, index) => {
+      {data
+      .filter((d) => (d.seller.toLowerCase().includes(searchTerm.toLowerCase())))
+      .map((d, index) => {
         return (
             <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
                 <h2 className="text-xl font-semibold mb-2">Address {truncateAddress(d.seller)}</h2>
                 <p className="text-gray-600">Amount: ${d.amount}</p>
                 <button
+                    onClick={() => {
+                        if (d.locked) {
+                            unlockMoney(d.key);
+                        } else {
+                            toast.error("Money is already unlocked", {
+                                position: 'top-center'
+                            })
+                        }
+                    }}
                     className={`mt-4 w-full bg-${d.locked ? 'blue' : 'blue'}-500 hover:bg-${d.locked ? 'blue' : ''}-700 text-white py-2 rounded-full transition duration-300 flex justify-center items-center`}
                     disabled={!d.locked}
                 >

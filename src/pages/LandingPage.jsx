@@ -9,7 +9,7 @@ import ABI from "./abi.json";
 import {ethers} from "ethers";
 
 
-const contractAddress = '0xb85C7be62ca03a08A8E7651308B275E19A29f1aE';
+const contractAddress = '0x24487e5b701E97196f9eB499AA9EB06e57321083';
 const productPurchaseContract = new ethers.Contract(contractAddress, ABI);
 const provider = new ethers.BrowserProvider(window.ethereum);
 const signer = await provider.getSigner();
@@ -38,7 +38,9 @@ export const getAllLockData = (setData) => {
   })
 }
 
-
+export const unlockMoney = (_key) => {
+  productPurchaseContract.connect(signer).unlockMoney(_key);
+}
 
 
 const LandingPage = () => {
