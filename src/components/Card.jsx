@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaBed, FaBath, FaCar, FaDollarSign } from 'react-icons/fa';
+import { handleBuyItem } from '../pages/LandingPage';
 
 const Card = ({ product }) => {
   const { productName, price, image, description, productOwner } = product;
@@ -22,6 +23,9 @@ const Card = ({ product }) => {
       </div>
       <div className="px-6 py-1">
         <button
+          onClick={() => {
+            handleBuyItem(description, price);
+          }}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full"
         >
           Buy

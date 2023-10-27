@@ -5,10 +5,32 @@ import { useNavigate } from "react-router-dom";
 import data from './data.json';
 import Card from "../components/Card";
 import toast from "react-hot-toast";
+import ABI from "./abi.json";
+import {ethers} from "ethers";
+
+
+const contractAddress = '0xb85C7be62ca03a08A8E7651308B275E19A29f1aE';
+const productPurchaseContract = new ethers.Contract(contractAddress, ABI);
+  
+export const handleBuyItem = async (description, priceInEther) => {
+  const account = localStorage.getItem('account');
+  if (account) {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const productPrice = ethers.parseEther(priceInEther.toString()); 
+    productPurchaseContract.connect(signer).buyProduct(signer, ethers.id(description), {
+      value: productPrice 
+    });
+  } else {
+    toast.error('Connect your wallet first', {
+      position: 'top-center'
+    });
+  }
+}
+
 
 const LandingPage = () => {
-   const [isConnected, setIsConnected] = useState(false);
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <div
       className="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-center top-0"
